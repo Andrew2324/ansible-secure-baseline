@@ -1,0 +1,12 @@
+# Ansible temp files
+*.retry
+*.log
+
+# SSH keys
+*.pem
+*.ppk
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/

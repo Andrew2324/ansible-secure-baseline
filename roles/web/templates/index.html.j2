@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ nginx_site_title }}</title>
+  </head>
+  <body>
+    <h1>{{ nginx_site_title }}</h1>
+    <p>{{ nginx_message }}</p>
+    <hr />
+    <p><strong>Host:</strong> {{ ansible_hostname }}</p>
+    <p><strong>Env:</strong> {{ project_env | default("dev") }}</p>
+  </body>
+</html>

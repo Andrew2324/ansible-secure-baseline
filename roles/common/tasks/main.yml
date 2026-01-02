@@ -1,0 +1,28 @@
+---
+- name: Ensure baseline packages are installed (dnf/yum)
+  ansible.builtin.package:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Set timezone (Amazon Linux 2023)
+  ansible.builtin.command: "timedatectl set-timezone {{ timezone_name }}"
+  changed_when: false
+
+- name: Create admin user (optional)
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    groups: wheel
+    append: true
+    shell: /bin/bash
+    create_home: true
+    state: present
+  when: create_admin_user | bool
+
+- name: Configure admin authorized_keys (optional)
+  ansible.posix.authorized_key:
+    user: "{{ admin_user }}"
+    key: "{{ admin_ssh_public_key }}"
+    state: present
+  when:
+    - create_admin_user | bool
+    - admin_ssh_public_key | length > 0

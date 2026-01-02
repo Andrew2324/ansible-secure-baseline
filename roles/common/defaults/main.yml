@@ -1,0 +1,6 @@
+common_packages: []
+timezone_name: "UTC"
+
+create_admin_user: false
+admin_user: "devops"
+admin_ssh_public_key: ""

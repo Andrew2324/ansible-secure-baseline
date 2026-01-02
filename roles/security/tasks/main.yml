@@ -1,0 +1,29 @@
+---
+- name: Ensure OpenSSH server is installed
+  ansible.builtin.package:
+    name: openssh-server
+    state: present
+
+- name: Deploy sshd_config from template
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0600"
+    backup: true
+
+- name: Validate sshd configuration (prevents lockout)
+  ansible.builtin.command: sshd -t
+  changed_when: false
+
+- name: Restart sshd only after successful validation
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: Ensure sshd is enabled and running
+  ansible.builtin.service:
+    name: sshd
+    enabled: true
+    state: started

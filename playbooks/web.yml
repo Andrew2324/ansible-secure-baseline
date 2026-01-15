@@ -1,0 +1,6 @@
+---
+- name: Deploy web stack (nginx)
+  hosts: web
+  become: true
+  roles:
+    - web

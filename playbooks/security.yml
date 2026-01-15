@@ -1,0 +1,6 @@
+---
+- name: Apply SSH hardening (security)
+  hosts: web
+  become: true
+  roles:
+    - security

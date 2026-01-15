@@ -1,0 +1,6 @@
+---
+- name: Apply baseline (common)
+  hosts: web
+  become: true
+  roles:
+    - common

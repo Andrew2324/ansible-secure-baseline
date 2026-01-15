@@ -1,0 +1,2 @@
+nginx_site_title: "Ansible Secure Baseline (AL2023)"
+nginx_message: "Deployed via Ansible roles: common + security + web."

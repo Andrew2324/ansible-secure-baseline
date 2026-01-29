@@ -37,9 +37,6 @@ flowchart LR
 ---
 
 
-
-```markdown
-
 ## Execution Flow
 
 ```mermaid
@@ -55,7 +52,6 @@ sequenceDiagram
   A->>H: Validate SSH config (sshd -t)
   A->>H: Apply web role (NGINX + static site)
   A->>H: Restart services via handlers (only if changed)
-
 ```
 
 ## What this project does

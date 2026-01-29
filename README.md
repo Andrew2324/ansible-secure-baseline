@@ -1,28 +1,80 @@
 # ansible-secure-baseline (Amazon Linux 2023)
 
-Portfolio-ready Ansible project that enforces a secure, repeatable server baseline and deploys application services using role-based automation.
+Portfolio-ready Ansible project that enforces a secure, repeatable OS baseline and deploys application services using role-based automation on Amazon Linux 2023.
 
 ---
 
 ## Why this exists
 
-In production environments, infrastructure provisioning and OS configuration are separate concerns. This project demonstrates how Ansible can be used **after infrastructure is provisioned** to enforce a secure baseline and deploy application services safely and repeatably.
+In real environments, infrastructure provisioning and OS configuration are separate concerns:
+
+- Terraform / CloudFormation: creates VPC, subnets, EC2, security groups, IAM, etc.
+
+- Ansible: configures the OS + services after the server exists
+
+This repo demonstrates a production-style pattern: IaC owns lifecycle, Ansible owns configuration and drift prevention.
 
 ---
 
-## Integration with Infrastructure as Code
+```mermaid
+flowchart LR
+  Dev[Engineer / CI Runner] -->|SSH| EC2[(Amazon Linux 2023 EC2)]
+  subgraph Repo[ansible-secure-baseline]
+    P[playbooks/site.yml]
+    R1[roles/common]
+    R2[roles/security]
+    R3[roles/web]
+    I[inventory/dev/*]
+  end
 
-This project is designed to run after infrastructure is provisioned using **Terraform or CloudFormation**. Infrastructure lifecycle is managed by IaC, while Ansible handles OS-level configuration and application deployment.
+  Dev -->|ansible-playbook| P
+  P --> R1 --> EC2
+  P --> R2 --> EC2
+  P --> R3 --> EC2
+  I --> P
+```
 
 ---
+
+
+
+```markdown
+
+## Execution Flow
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as You / Runner
+  participant A as Ansible
+  participant H as EC2 Host (Amazon Linux 2023)
+
+  U->>A: ansible-playbook playbooks/site.yml -i inventory/dev/hosts.ini
+  A->>H: Apply common role (packages, timezone, admin user)
+  A->>H: Apply security role (SSHD hardening)
+  A->>H: Validate SSH config (sshd -t)
+  A->>H: Apply web role (NGINX + static site)
+  A->>H: Restart services via handlers (only if changed)
+
+```
 
 ## What this project does
 
 The project applies a secure baseline using modular Ansible roles:
 
-- **common**: Baseline packages, timezone configuration, optional admin user
-- **security**: SSH hardening with safe validation (`sshd -t`)
-- **web**: NGINX installation and static page deployment
+## Roles
+
+- **common**
+    - Baseline packages
+    - Timezone configuration
+    - Optional admin user bootstrap (if enabled)
+- **security**
+    - SSH hardening (safe defaults)
+    - Safety validation before restart using sshd -t
+- **web**
+    - NGINX install + enable
+    - Deploy static page/content
+    - Uses handlers to restart only when changes occur
 
 ### Key characteristics
 
@@ -55,3 +107,13 @@ roles/common
 roles/security
 roles/web
 diagram/architecture.drawio
+```
+---
+
+## Prerequisites
+
+- Ansible installed locally (or in your CI runner)
+- SSH access to the instance (key-based auth)
+- EC2 security group allows inbound SSH from your IP (or via bastion/SSM)
+
+Recommended: start with a single dev host, then expand to multiple hosts/groups.
